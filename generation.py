@@ -1,36 +1,3 @@
-from Tkinter import *
-window = Tk()
-labelText = StringVar()
-
-
-
-def callback():
-    start = numpy.random.randint(0, len(dataX)-1)
-    pattern = dataX[start]
-    print ("Seed:")
-    print ("\"", ''.join([int_to_char[value] for value in pattern]), "\"")
-    # generate characters
-
-    rap_line = ""
-    labelText.set("generowanie nowego tekstu")
-    for i in range(1000):
-        x = numpy.reshape(pattern, (1, len(pattern), 1))
-        x = x / float(n_vocab)
-        prediction = model.predict(x, verbose=0)
-        index = numpy.argmax(prediction)
-        result = int_to_char[index]
-        seq_in = [int_to_char[value] for value in pattern]
-        sys.stdout.write(result)
-        rap_line+=result
-        pattern.append(index)
-        pattern = pattern[1:len(pattern)]
-    print("\nDone.")
-    print("RAP LINE: ",rap_line)
-    print(type(rap_line))
-    labelText.set(rap_line)
-
-
-## NN
 
 import numpy
 from keras.models import Sequential
@@ -61,7 +28,7 @@ for i in range(0, n_chars - seq_length, 1):
     seq_out = raw_text[i + seq_length]
     dataX.append([char_to_int[char] for char in seq_in])
     dataY.append(char_to_int[seq_out])
-    n_patterns = len(dataX)
+n_patterns = len(dataX)
 print("Total Patterns: ", n_patterns)
 # reshape X to be [samples, time steps, features]
 X = numpy.reshape(dataX, (n_patterns, seq_length, 1))
@@ -81,28 +48,26 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 
  # load the network weights\n",
-filename = "weights-improvement-01-1.6926.hdf5"
+filename = "weights-improvement-06-1.7180.hdf5"
 model.load_weights(filename)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 int_to_char = dict((i, c) for i, c in enumerate(chars))
 
-
-
-
-
-
-title = Label(window,text = "Neural Rap",width = '200')
-title.config(font=("Courier", 44))
-title.pack()
-
-
-#e = Entry(window,width = '200')
-#e.insert(0, "wpisz poczatek tekstu")
-#e.pack()
-b = Button(window, text="generuj rap", width=10, command=callback)
-b.pack()
-rap = Label(window,textvariable  = labelText,width = '200',wraplength='800')
-rap.config(font=("Courier", 24))
-rap.pack()
-window.mainloop()
+# pick a random seed
+start = numpy.random.randint(0, len(dataX)-1)
+pattern = dataX[start]
+print ("Seed:")
+print ("\"", ''.join([int_to_char[value] for value in pattern]), "\"")
+# generate characters
+for i in range(1000):
+    x = numpy.reshape(pattern, (1, len(pattern), 1))
+    x = x / float(n_vocab)
+    prediction = model.predict(x, verbose=0)
+    index = numpy.argmax(prediction)
+    result = int_to_char[index]
+    seq_in = [int_to_char[value] for value in pattern]
+    sys.stdout.write(result)
+    pattern.append(index)
+    pattern = pattern[1:len(pattern)]
+print("\nDone.")
